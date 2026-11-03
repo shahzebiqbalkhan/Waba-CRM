@@ -8,6 +8,9 @@ export interface ParsedContactRow {
   name?: string;
   email?: string;
   company?: string;
+  location?: string;
+  requirement?: string;
+  note?: string;
   /** Tag names from the optional `tags` column (comma/semicolon separated). */
   tagNames: string[];
 }
@@ -44,6 +47,12 @@ export interface ParseContactCsvResult {
   hasTagsColumn: boolean;
   /** True when the CSV header includes a `company` column. */
   hasCompanyColumn: boolean;
+  /** True when the CSV header includes a `location` column. */
+  hasLocationColumn: boolean;
+  /** True when the CSV header includes a `requirement` column. */
+  hasRequirementColumn: boolean;
+  /** True when the CSV header includes a `note` column. */
+  hasNoteColumn: boolean;
 }
 
 export function parseContactCsv(text: string): ParseContactCsvResult {
@@ -54,6 +63,9 @@ export function parseContactCsv(text: string): ParseContactCsvResult {
       hasPhoneColumn: false,
       hasTagsColumn: false,
       hasCompanyColumn: false,
+      hasLocationColumn: false,
+      hasRequirementColumn: false,
+      hasNoteColumn: false,
     };
   }
 
@@ -68,6 +80,9 @@ export function parseContactCsv(text: string): ParseContactCsvResult {
       hasPhoneColumn: false,
       hasTagsColumn: false,
       hasCompanyColumn: false,
+      hasLocationColumn: false,
+      hasRequirementColumn: false,
+      hasNoteColumn: false,
     };
   }
 
@@ -75,6 +90,24 @@ export function parseContactCsv(text: string): ParseContactCsvResult {
   const emailIdx = headers.indexOf('email');
   const companyIdx = headers.indexOf('company');
   const tagsIdx = headers.indexOf('tags');
+  const locationIdx = headers.findIndex((h) =>
+    ['location', 'city', 'address', 'area', 'place'].includes(h)
+  );
+  const requirementIdx = headers.findIndex((h) =>
+    [
+      'requirement',
+      'requirements',
+      'customer requirement',
+      'customer_requirement',
+      'customer requirements',
+      'inquiry',
+      'enquiry',
+      'service',
+    ].includes(h)
+  );
+  const noteIdx = headers.findIndex((h) =>
+    ['note', 'notes', 'remark', 'remarks', 'comment', 'comments', 'customer note'].includes(h)
+  );
 
   const rows: ParsedContactRow[] = [];
 
@@ -105,6 +138,18 @@ export function parseContactCsv(text: string): ParseContactCsvResult {
         companyIdx >= 0
           ? values[companyIdx]?.replace(/["']/g, '').trim() || undefined
           : undefined,
+      location:
+        locationIdx >= 0
+          ? values[locationIdx]?.replace(/["']/g, '').trim() || undefined
+          : undefined,
+      requirement:
+        requirementIdx >= 0
+          ? values[requirementIdx]?.replace(/["']/g, '').trim() || undefined
+          : undefined,
+      note:
+        noteIdx >= 0
+          ? values[noteIdx]?.replace(/["']/g, '').trim() || undefined
+          : undefined,
       tagNames:
         tagsIdx >= 0 ? parseTagCell(values[tagsIdx]?.replace(/["']/g, '')) : [],
     });
@@ -115,6 +160,9 @@ export function parseContactCsv(text: string): ParseContactCsvResult {
     hasPhoneColumn: true,
     hasTagsColumn: tagsIdx >= 0,
     hasCompanyColumn: companyIdx >= 0,
+    hasLocationColumn: locationIdx >= 0,
+    hasRequirementColumn: requirementIdx >= 0,
+    hasNoteColumn: noteIdx >= 0,
   };
 }
 

@@ -34,12 +34,18 @@ describe('parseContactCsv', () => {
       hasPhoneColumn: true,
       hasTagsColumn: true,
       hasCompanyColumn: false,
+      hasLocationColumn: false,
+      hasRequirementColumn: false,
+      hasNoteColumn: false,
       rows: [
         {
           phone: '+15551234567',
           name: 'Alice',
           email: undefined,
           company: undefined,
+          location: undefined,
+          requirement: undefined,
+          note: undefined,
           tagNames: ['VIP', 'Lead'],
         },
         {
@@ -47,6 +53,9 @@ describe('parseContactCsv', () => {
           name: 'Bob',
           email: undefined,
           company: undefined,
+          location: undefined,
+          requirement: undefined,
+          note: undefined,
           tagNames: ['Customer'],
         },
       ],
@@ -65,6 +74,9 @@ describe('parseContactCsv', () => {
       name: 'Bob',
       email: undefined,
       company: undefined,
+      location: undefined,
+      requirement: undefined,
+      note: undefined,
       tagNames: [],
     });
   });
@@ -77,12 +89,44 @@ describe('parseContactCsv', () => {
       hasPhoneColumn: true,
       hasTagsColumn: false,
       hasCompanyColumn: false,
+      hasLocationColumn: false,
+      hasRequirementColumn: false,
+      hasNoteColumn: false,
       rows: [
         {
           phone: '+15551234567',
           name: 'Alice',
           email: undefined,
           company: undefined,
+          location: undefined,
+          requirement: undefined,
+          note: undefined,
+          tagNames: [],
+        },
+      ],
+    });
+  });
+
+  it('parses location, requirement, and note columns', () => {
+    const csv = `phone,name,location,requirement,note
++15551234567,Alice,New York,"Needs CRM setup","Follow up on Friday"`;
+
+    expect(parseContactCsv(csv)).toEqual({
+      hasPhoneColumn: true,
+      hasTagsColumn: false,
+      hasCompanyColumn: false,
+      hasLocationColumn: true,
+      hasRequirementColumn: true,
+      hasNoteColumn: true,
+      rows: [
+        {
+          phone: '+15551234567',
+          name: 'Alice',
+          email: undefined,
+          company: undefined,
+          location: 'New York',
+          requirement: 'Needs CRM setup',
+          note: 'Follow up on Friday',
           tagNames: [],
         },
       ],

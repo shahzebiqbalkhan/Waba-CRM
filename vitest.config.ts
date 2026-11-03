@@ -1,9 +1,10 @@
 import { defineConfig } from "vitest/config";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   resolve: {
     tsconfigPaths: true,
-    alias: { "@app-messages": new URL("./messages/en.json", import.meta.url).pathname },
+    alias: { "@app-messages": fileURLToPath(new URL("./messages/en.json", import.meta.url)) },
   },
   test: {
     environment: "node",

@@ -246,6 +246,24 @@ export function MediaAudioBubble({
   );
 }
 
+function getDocumentLabel(message: Message, defaultLabel: string): string {
+  if (message.content_type !== "template" && message.content_text?.trim()) {
+    return message.content_text;
+  }
+  if (message.media_url) {
+    try {
+      const url = new URL(message.media_url);
+      const filename = url.pathname.split("/").pop();
+      if (filename) {
+        return decodeURIComponent(filename.replace(/^\d+-/, ""));
+      }
+    } catch {
+      // fallback to defaultLabel
+    }
+  }
+  return defaultLabel;
+}
+
 export function MediaDocumentBubble({
   message,
   t,
@@ -254,9 +272,10 @@ export function MediaDocumentBubble({
   t: Translator;
 }) {
   const { downloading, download } = useMediaDownload(message, t);
+  const isAgent = message.sender_type === "agent" || message.sender_type === "bot";
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-full min-w-0 max-w-full items-center gap-2">
       <a
         href={message.media_url}
         target="_blank"
@@ -267,10 +286,22 @@ export function MediaDocumentBubble({
           void download();
         }}
         aria-busy={downloading || undefined}
-        className="flex min-w-0 flex-1 items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm hover:bg-muted"
+        className={cn(
+          "flex min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+          isAgent
+            ? "bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/25"
+            : "bg-muted/50 text-foreground hover:bg-muted",
+        )}
       >
-        <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
-        <span className="truncate">{message.content_text || t("document")}</span>
+        <FileText
+          className={cn(
+            "h-5 w-5 shrink-0",
+            isAgent ? "text-primary-foreground/80" : "text-muted-foreground",
+          )}
+        />
+        <span className="truncate font-medium">
+          {getDocumentLabel(message, t("document"))}
+        </span>
       </a>
       <MediaActionButton
         icon={Download}

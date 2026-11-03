@@ -39,6 +39,8 @@ import {
   X,
   DollarSign,
   LayoutTemplate,
+  MapPin,
+  ClipboardList,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { planCustomValueWrites } from '@/lib/contacts/custom-value-writes';
@@ -77,6 +79,8 @@ export function ContactDetailView({
   const [editPhone, setEditPhone] = useState('');
   const [editEmail, setEditEmail] = useState('');
   const [editCompany, setEditCompany] = useState('');
+  const [editLocation, setEditLocation] = useState('');
+  const [editRequirement, setEditRequirement] = useState('');
   const [savingDetails, setSavingDetails] = useState(false);
 
   // Tags tab
@@ -116,6 +120,8 @@ export function ContactDetailView({
       setEditPhone(data.phone);
       setEditEmail(data.email ?? '');
       setEditCompany(data.company ?? '');
+      setEditLocation(data.location ?? '');
+      setEditRequirement(data.requirement ?? '');
     }
     setLoading(false);
   }, [contactId, supabase]);
@@ -224,6 +230,8 @@ export function ContactDetailView({
         phone: editPhone.trim(),
         email: editEmail.trim() || null,
         company: editCompany.trim() || null,
+        location: editLocation.trim() || null,
+        requirement: editRequirement.trim() || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', contactId);
@@ -358,6 +366,7 @@ export function ContactDetailView({
             body: values.body,
             headerText: values.headerText,
             buttonParams: values.buttonParams,
+            headerMediaUrl: values.headerMediaUrl,
           },
           template_params: values.body,
         }),
@@ -440,6 +449,12 @@ export function ContactDetailView({
                       <span className="flex items-center gap-1">
                         <Building2 className="size-3" />
                         {contact.company}
+                      </span>
+                    )}
+                    {contact.location && (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="size-3" />
+                        {contact.location}
                       </span>
                     )}
                   </div>
@@ -532,6 +547,25 @@ export function ContactDetailView({
                       value={editCompany}
                       onChange={(e) => setEditCompany(e.target.value)}
                       className="bg-muted border-border text-foreground h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-muted-foreground text-xs">{t('location')}</Label>
+                    <Input
+                      value={editLocation}
+                      onChange={(e) => setEditLocation(e.target.value)}
+                      placeholder="e.g. Mumbai, India"
+                      className="bg-muted border-border text-foreground h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-muted-foreground text-xs">{t('requirement')}</Label>
+                    <Textarea
+                      value={editRequirement}
+                      onChange={(e) => setEditRequirement(e.target.value)}
+                      placeholder="Customer requirements, project scope, notes..."
+                      rows={3}
+                      className="bg-muted border-border text-foreground text-sm"
                     />
                   </div>
                   <Button

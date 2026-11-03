@@ -15,6 +15,8 @@ import {
   DollarSign,
   StickyNote,
   Plus,
+  MapPin,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -157,6 +159,12 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
             {contact.company && (
               <p className="text-xs text-muted-foreground">{contact.company}</p>
             )}
+            {contact.location && (
+              <p className="mt-1 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3 text-muted-foreground" />
+                <span>{contact.location}</span>
+              </p>
+            )}
           </div>
 
           {/* Phone */}
@@ -183,6 +191,22 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
               </div>
             )}
           </div>
+
+          {/* Customer Requirement */}
+          {contact.requirement && (
+            <>
+              <div className="my-4 border-t border-border" />
+              <div>
+                <div className="flex items-center gap-1.5 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <ClipboardList className="h-3 w-3" />
+                  <span>Requirement</span>
+                </div>
+                <div className="mt-2 rounded-lg bg-muted/60 p-2.5 text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+                  {contact.requirement}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Divider */}
           <div className="my-4 border-t border-border" />

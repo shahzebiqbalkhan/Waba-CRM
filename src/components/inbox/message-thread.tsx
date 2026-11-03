@@ -774,6 +774,8 @@ export function MessageThread({
       values: {
         body: string[];
         headerText?: string;
+        headerMediaUrl?: string;
+        headerMediaFilename?: string;
         buttonParams?: Record<number, string>;
       },
     ) => {
@@ -788,7 +790,9 @@ export function MessageThread({
         sender_type: "agent",
         content_type: "template",
         content_text: renderedBody,
-        media_url: templateHeaderMediaUrl(template) ?? undefined,
+        media_url:
+          values.headerMediaUrl ||
+          (templateHeaderMediaUrl(template) ?? undefined),
         template_name: template.name,
         status: "sending",
         created_at: new Date().toISOString(),
@@ -812,6 +816,7 @@ export function MessageThread({
               body: values.body,
               headerText: values.headerText,
               buttonParams: values.buttonParams,
+              headerMediaUrl: values.headerMediaUrl,
             },
             template_params: values.body,
             content_text: renderedBody,

@@ -118,6 +118,8 @@ export interface Contact {
   name?: string;
   email?: string;
   company?: string;
+  location?: string | null;
+  requirement?: string | null;
   avatar_url?: string;
   created_at: string;
   updated_at: string;

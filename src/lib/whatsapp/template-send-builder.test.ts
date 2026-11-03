@@ -143,6 +143,17 @@ describe('buildSendComponents — header', () => {
     });
   });
 
+  it('uses an explicit headerMediaUrl override for a document header', () => {
+    const components = buildSendComponents(
+      row({ header_type: 'document' }),
+      { headerMediaUrl: 'https://cdn.example.com/invoice-123.pdf' },
+    );
+    expect(components[0]).toEqual({
+      type: 'header',
+      parameters: [{ type: 'document', document: { link: 'https://cdn.example.com/invoice-123.pdf' } }],
+    });
+  });
+
   it('throws on media header with no link OR id available', () => {
     expect(() =>
       buildSendComponents(row({ header_type: 'image' })),

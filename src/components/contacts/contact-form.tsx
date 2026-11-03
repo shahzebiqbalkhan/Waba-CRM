@@ -56,6 +56,8 @@ export function ContactForm({
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
+  const [location, setLocation] = useState('');
+  const [requirement, setRequirement] = useState('');
   const [saving, setSaving] = useState(false);
 
   // Duplicate-phone detection for NEW contacts. `exact` (same digits)
@@ -77,6 +79,8 @@ export function ContactForm({
       setPhone(contact?.phone ?? '');
       setEmail(contact?.email ?? '');
       setCompany(contact?.company ?? '');
+      setLocation(contact?.location ?? '');
+      setRequirement(contact?.requirement ?? '');
       setSelectedTagIds(contactTags.map((ct) => ct.tag_id));
       setDupMatch(null);
       fetchTags();
@@ -170,6 +174,8 @@ export function ContactForm({
             phone: phone.trim(),
             email: email.trim() || null,
             company: company.trim() || null,
+            location: location.trim() || null,
+            requirement: requirement.trim() || null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', contactId);
@@ -184,6 +190,8 @@ export function ContactForm({
             phone: phone.trim(),
             email: email.trim() || null,
             company: company.trim() || null,
+            location: location.trim() || null,
+            requirement: requirement.trim() || null,
           })
           .select('id')
           .single();
@@ -333,6 +341,33 @@ export function ContactForm({
               onChange={(e) => setCompany(e.target.value)}
               placeholder={t('companyPlaceholder')}
               className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cf-location" className="text-muted-foreground">
+              {t('locationLabel')}
+            </Label>
+            <Input
+              id="cf-location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder={t('locationPlaceholder')}
+              className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cf-requirement" className="text-muted-foreground">
+              {t('requirementLabel')}
+            </Label>
+            <textarea
+              id="cf-requirement"
+              value={requirement}
+              onChange={(e) => setRequirement(e.target.value)}
+              placeholder={t('requirementPlaceholder')}
+              rows={3}
+              className="w-full rounded-md bg-muted border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 

@@ -135,6 +135,9 @@ export function ImportModal({
   const [parsedRows, setParsedRows] = useState<ParsedContactRow[]>([]);
   const [hasTagsColumn, setHasTagsColumn] = useState(false);
   const [hasCompanyColumn, setHasCompanyColumn] = useState(false);
+  const [hasLocationColumn, setHasLocationColumn] = useState(false);
+  const [hasRequirementColumn, setHasRequirementColumn] = useState(false);
+  const [hasNoteColumn, setHasNoteColumn] = useState(false);
   const [tagColorByKey, setTagColorByKey] = useState<Map<string, string>>(
     new Map()
   );
@@ -153,6 +156,9 @@ export function ImportModal({
     setParsedRows([]);
     setHasTagsColumn(false);
     setHasCompanyColumn(false);
+    setHasLocationColumn(false);
+    setHasRequirementColumn(false);
+    setHasNoteColumn(false);
     setTagColorByKey(new Map());
     setResult(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -175,6 +181,9 @@ export function ImportModal({
       rows,
       hasTagsColumn: csvHasTags,
       hasCompanyColumn: csvHasCompany,
+      hasLocationColumn: csvHasLocation,
+      hasRequirementColumn: csvHasRequirement,
+      hasNoteColumn: csvHasNote,
     } = parseContactCsv(text);
 
     if (rows.length === 0) {
@@ -182,6 +191,9 @@ export function ImportModal({
       setParsedRows([]);
       setHasTagsColumn(false);
       setHasCompanyColumn(false);
+      setHasLocationColumn(false);
+      setHasRequirementColumn(false);
+      setHasNoteColumn(false);
       setTagColorByKey(new Map());
       return;
     }
@@ -189,6 +201,9 @@ export function ImportModal({
     setParsedRows(rows);
     setHasTagsColumn(csvHasTags);
     setHasCompanyColumn(csvHasCompany);
+    setHasLocationColumn(csvHasLocation);
+    setHasRequirementColumn(csvHasRequirement);
+    setHasNoteColumn(csvHasNote);
 
     if (csvHasTags && accountId) {
       const { data: tags } = await supabase
@@ -274,6 +289,7 @@ export function ImportModal({
       }
 
       const tagAssignments: ContactTagAssignment[] = [];
+      const noteAssignments: { contact_id: string; user_id: string; note_text: string }[] = [];
 
       // 4) Batch insert the genuinely-new rows in chunks of 50. The DB
       //    unique index is the backstop: a 23505 (race, or a format
@@ -289,6 +305,8 @@ export function ImportModal({
           name: row.name || null,
           email: row.email || null,
           company: row.company || null,
+          location: row.location || null,
+          requirement: row.requirement || null,
         }));
 
         const { data, error } = await supabase
@@ -314,6 +332,13 @@ export function ImportModal({
                 tagAssignments.push({
                   contactId: singleData.id,
                   tagNames: source.tagNames,
+                });
+              }
+              if (source.note?.trim()) {
+                noteAssignments.push({
+                  contact_id: singleData.id,
+                  user_id: user.id,
+                  note_text: source.note.trim(),
                 });
               }
             } else if (isUniqueViolation(singleErr)) {
@@ -346,12 +371,30 @@ export function ImportModal({
           // parallel inserts, zip by phone or returned id instead.
           for (let j = 0; j < inserted.length; j++) {
             const source = chunk[j];
-            if (!source || source.tagNames.length === 0) continue;
-            tagAssignments.push({
-              contactId: inserted[j].id,
-              tagNames: source.tagNames,
-            });
+            if (!source) continue;
+            if (source.tagNames.length > 0) {
+              tagAssignments.push({
+                contactId: inserted[j].id,
+                tagNames: source.tagNames,
+              });
+            }
+            if (source.note?.trim()) {
+              noteAssignments.push({
+                contact_id: inserted[j].id,
+                user_id: user.id,
+                note_text: source.note.trim(),
+              });
+            }
           }
+        }
+      }
+
+      // 5) Insert notes if any were provided in the CSV
+      if (noteAssignments.length > 0) {
+        try {
+          await supabase.from('contact_notes').insert(noteAssignments);
+        } catch (noteErr) {
+          console.error('[contacts import] failed to insert contact notes:', noteErr);
         }
       }
 
@@ -415,6 +458,12 @@ export function ImportModal({
   // avoiding an all-dash column that wastes horizontal space.
   const previewHasCompany =
     hasCompanyColumn && preview.some((row) => row.company?.trim());
+  const previewHasLocation =
+    hasLocationColumn && preview.some((row) => row.location?.trim());
+  const previewHasRequirement =
+    hasRequirementColumn && preview.some((row) => row.requirement?.trim());
+  const previewHasNote =
+    hasNoteColumn && preview.some((row) => row.note?.trim());
 
   const tagStats = useMemo(() => {
     const names = new Set<string>();
@@ -538,6 +587,21 @@ export function ImportModal({
                             {t('columns.company')}
                           </th>
                         )}
+                        {previewHasLocation && (
+                          <th className="px-3 py-2 text-left font-medium whitespace-nowrap text-muted-foreground">
+                            {t('columns.location')}
+                          </th>
+                        )}
+                        {previewHasRequirement && (
+                          <th className="px-3 py-2 text-left font-medium whitespace-nowrap text-muted-foreground">
+                            {t('columns.requirement')}
+                          </th>
+                        )}
+                        {previewHasNote && (
+                          <th className="px-3 py-2 text-left font-medium whitespace-nowrap text-muted-foreground">
+                            {t('columns.note')}
+                          </th>
+                        )}
                         {previewHasTags && (
                           <th className="px-3 py-2 text-left font-medium whitespace-nowrap text-muted-foreground">
                             {t('columns.tags')}
@@ -575,6 +639,30 @@ export function ImportModal({
                               <PreviewCell
                                 value={row.company || '—'}
                                 maxWidth="max-w-[7rem]"
+                              />
+                            </td>
+                          )}
+                          {previewHasLocation && (
+                            <td className="px-3 py-2 text-muted-foreground">
+                              <PreviewCell
+                                value={row.location || '—'}
+                                maxWidth="max-w-[7rem]"
+                              />
+                            </td>
+                          )}
+                          {previewHasRequirement && (
+                            <td className="px-3 py-2 text-muted-foreground">
+                              <PreviewCell
+                                value={row.requirement || '—'}
+                                maxWidth="max-w-[10rem]"
+                              />
+                            </td>
+                          )}
+                          {previewHasNote && (
+                            <td className="px-3 py-2 text-muted-foreground">
+                              <PreviewCell
+                                value={row.note || '—'}
+                                maxWidth="max-w-[10rem]"
                               />
                             </td>
                           )}
