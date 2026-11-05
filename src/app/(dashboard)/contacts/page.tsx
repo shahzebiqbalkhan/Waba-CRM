@@ -62,6 +62,7 @@ import {
   contactSearchPattern,
 } from '@/lib/contacts/search-filter';
 import { pageAfterRangeError, pageAfterShrink } from '@/lib/contacts/page-bounds';
+import { formatContactId } from '@/lib/contacts/format-contact-id';
 
 const PAGE_SIZE = 25;
 
@@ -560,6 +561,7 @@ export default function ContactsPage() {
                   aria-label={t('selectAllOnPage')}
                 />
               </TableHead>
+              <TableHead className="text-muted-foreground w-20">{t('tableColumns.id')}</TableHead>
               <TableHead className="text-muted-foreground">{t('tableColumns.name')}</TableHead>
               <TableHead className="text-muted-foreground">{t('tableColumns.phone')}</TableHead>
               <TableHead className="text-muted-foreground hidden md:table-cell">{t('tableColumns.email')}</TableHead>
@@ -572,7 +574,7 @@ export default function ContactsPage() {
           <TableBody>
             {loading ? (
               <TableRow className="border-border">
-                <TableCell colSpan={8} className="text-center py-12">
+                <TableCell colSpan={9} className="text-center py-12">
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="size-6 animate-spin text-primary" />
                     <p className="text-sm text-muted-foreground">{t('loading')}</p>
@@ -581,7 +583,7 @@ export default function ContactsPage() {
               </TableRow>
             ) : contacts.length === 0 ? (
               <TableRow className="border-border">
-                <TableCell colSpan={8} className="text-center py-12">
+                <TableCell colSpan={9} className="text-center py-12">
                   <div className="flex flex-col items-center gap-2">
                     <Users className="size-8 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">
@@ -618,6 +620,15 @@ export default function ContactsPage() {
                       onCheckedChange={() => toggleSelect(contact.id)}
                       aria-label={t('selectContact', { name: contact.name || contact.phone })}
                     />
+                  </TableCell>
+                  <TableCell className="font-mono text-xs font-semibold">
+                    {contact.contact_number ? (
+                      <span className="inline-flex items-center rounded bg-muted/70 px-1.5 py-0.5 text-foreground/80 font-mono text-xs">
+                        #{formatContactId(contact.contact_number)}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-foreground font-medium">
                     {contact.name || <span className="text-muted-foreground italic">{t('unnamed')}</span>}

@@ -567,6 +567,7 @@
       "clearSelection": "Clear",
       "deleteSelected": "Delete selected",
       "tableColumns": {
+        "id": "ID",
         "name": "Name",
         "phone": "Phone",
         "email": "Email",

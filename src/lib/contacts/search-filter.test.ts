@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   contactSearchFilter,
+  contactSearchNumber,
   contactSearchPattern,
   phoneSearchDigits,
   sanitizeContactSearch,
@@ -87,5 +88,36 @@ describe('contactSearchPattern', () => {
 
   it('returns null when nothing searchable is left', () => {
     expect(contactSearchPattern(' ,()* ')).toBeNull();
+  });
+
+  it('strips leading hash for pattern search', () => {
+    expect(contactSearchPattern('#0042')).toBe('0042');
+  });
+});
+
+describe('contactSearchNumber', () => {
+  it('parses numeric terms with or without hash prefix', () => {
+    expect(contactSearchNumber('42')).toBe(42);
+    expect(contactSearchNumber('0042')).toBe(42);
+    expect(contactSearchNumber('#0042')).toBe(42);
+    expect(contactSearchNumber('#1')).toBe(1);
+  });
+
+  it('rejects non-numeric terms or negative numbers', () => {
+    expect(contactSearchNumber('John')).toBeNull();
+    expect(contactSearchNumber('42A')).toBeNull();
+    expect(contactSearchNumber('0')).toBeNull();
+    expect(contactSearchNumber('-5')).toBeNull();
+  });
+});
+
+describe('contactSearchFilter with contact number', () => {
+  it('adds contact_number equality check when term is numeric or prefixed with #', () => {
+    expect(contactSearchFilter('#0042')).toBe(
+      'name.ilike.*0042*,phone.ilike.*0042*,contact_number.eq.42'
+    );
+    expect(contactSearchFilter('42')).toBe(
+      'name.ilike.*42*,phone.ilike.*42*,contact_number.eq.42'
+    );
   });
 });

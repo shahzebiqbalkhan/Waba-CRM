@@ -82,7 +82,18 @@ vi.mock("./admin-client", () => {
       return { data: state.owned, error: null };
     }
     if (table === "conversations") {
-      return { data: state.ownedConversation, error: null };
+      if (type === "insert") {
+        const id = (ops.payload as { id?: string })?.id ?? "conv-created-1";
+        const row = { id, ...(ops.payload as Record<string, unknown>) };
+        return { data: ops.single ? row : [row], error: null };
+      }
+      if (state.ownedConversation) {
+        return {
+          data: ops.single ? state.ownedConversation : [state.ownedConversation],
+          error: null,
+        };
+      }
+      return { data: ops.single ? null : [], error: null };
     }
     if (table === "custom_fields") {
       // account-scoped ownership lookup for a custom field definition
@@ -179,7 +190,7 @@ import {
   runAutomationsForTrigger,
   triggerMatches,
 } from "./engine";
-import { engineSendInteractive, engineSendText } from "./meta-send";
+import { engineSendInteractive, engineSendTemplate, engineSendText } from "./meta-send";
 import type { Automation, KeywordMatchTriggerConfig } from "@/types";
 
 const ACCOUNT = "acct-1";
@@ -534,7 +545,7 @@ describe("triggerMatches — tag_added", () => {
 });
 
 describe("tag_added — conversation policy", () => {
-  it("records a clear failed step when the contact has no conversation", async () => {
+  it("records a clear failed step when the contact has no conversation for plain send_message", async () => {
     h.state.owned = { id: "c1" };
     h.state.automations = [{
       id: "a1",
@@ -565,6 +576,42 @@ describe("tag_added — conversation policy", () => {
       status: "failed",
       error_message: "tag_added automation cannot send: contact has no existing conversation",
     }));
+  });
+
+  it("auto-creates conversation when step is send_template for contact with no conversation", async () => {
+    h.state.owned = { id: "c1" };
+    h.state.ownedConversation = null;
+    h.state.automations = [{
+      id: "a1",
+      account_id: ACCOUNT,
+      user_id: "u1",
+      name: "tag outreach template",
+      trigger_type: "tag_added",
+      trigger_config: { tag_id: "tag-a" },
+      is_active: true,
+    }];
+    h.state.steps = [{
+      id: "s1",
+      automation_id: "a1",
+      step_type: "send_template",
+      position: 0,
+      parent_step_id: null,
+      step_config: { template_name: "welcome_promo", language: "en" },
+    }];
+
+    await runAutomationsForTrigger({
+      accountId: ACCOUNT,
+      triggerType: "tag_added",
+      contactId: "c1",
+      context: { tag_id: "tag-a" },
+    });
+
+    expect(engineSendTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        conversationId: "conv-created-1",
+        templateName: "welcome_promo",
+      }),
+    );
   });
 });
 

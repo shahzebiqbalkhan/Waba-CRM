@@ -46,6 +46,7 @@ import { useTranslations } from 'next-intl';
 import { planCustomValueWrites } from '@/lib/contacts/custom-value-writes';
 import { contactHandle } from '@/lib/whatsapp/wa-identity';
 import { parseInternationalPhone } from '@/lib/whatsapp/phone-utils';
+import { formatContactId } from '@/lib/contacts/format-contact-id';
 
 interface ContactDetailViewProps {
   open: boolean;
@@ -420,9 +421,16 @@ export function ContactDetailView({
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <SheetTitle className="text-popover-foreground truncate">
-                    {contact.name || t('unnamed')}
-                  </SheetTitle>
+                  <div className="flex items-center gap-2">
+                    <SheetTitle className="text-popover-foreground truncate">
+                      {contact.name || t('unnamed')}
+                    </SheetTitle>
+                    {contact.contact_number ? (
+                      <span className="inline-flex items-center rounded bg-muted/80 px-1.5 py-0.5 font-mono text-xs font-semibold text-foreground">
+                        #{formatContactId(contact.contact_number)}
+                      </span>
+                    ) : null}
+                  </div>
                   <SheetDescription className="text-muted-foreground text-xs mt-0.5">
                     {t('contactDetailsDesc')}
                   </SheetDescription>

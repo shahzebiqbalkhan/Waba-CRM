@@ -23,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { contactHandle } from "@/lib/whatsapp/wa-identity";
+import { formatContactId } from "@/lib/contacts/format-contact-id";
 
 interface ContactSidebarProps {
   contact: Contact | null;
@@ -156,6 +157,11 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
             <h3 className="mt-3 text-sm font-semibold text-foreground">
               {displayName}
             </h3>
+            {contact.contact_number ? (
+              <span className="mt-1 inline-flex items-center rounded bg-muted/80 px-2 py-0.5 font-mono text-xs font-semibold text-foreground">
+                #{formatContactId(contact.contact_number)}
+              </span>
+            ) : null}
             {contact.company && (
               <p className="text-xs text-muted-foreground">{contact.company}</p>
             )}

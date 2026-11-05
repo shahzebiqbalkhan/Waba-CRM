@@ -567,6 +567,7 @@
       "clearSelection": "지우기",
       "deleteSelected": "선택 항목 삭제",
       "tableColumns": {
+        "id": "ID",
         "name": "이름",
         "phone": "전화번호",
         "email": "이메일",

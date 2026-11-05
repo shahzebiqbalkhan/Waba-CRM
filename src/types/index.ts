@@ -120,6 +120,9 @@ export interface Contact {
   company?: string;
   location?: string | null;
   requirement?: string | null;
+  /** Sequential, human-friendly contact number scoped to the account (e.g. 1, 2, 42).
+   *  Formatted in the UI as zero-padded (e.g. "0001", "0042"). Read-only. */
+  contact_number?: number | null;
   avatar_url?: string;
   created_at: string;
   updated_at: string;

@@ -22,6 +22,7 @@ import { supabaseAdmin } from './admin-client'
 import { addContactTagIfAbsent } from '@/lib/contacts/tag-write'
 import { MAX_TAG_CHAIN_DEPTH, getTagChainDepth } from '@/lib/contacts/tag-chain'
 import { engineSendText, engineSendTemplate, engineSendInteractive } from './meta-send'
+import { findOrCreateConversationRow } from '@/lib/whatsapp/resolve-conversation'
 import { validateInteractivePayload } from '@/lib/whatsapp/interactive'
 import { isDeliverableUrl } from '@/lib/webhooks/ssrf'
 import { getT } from '@/lib/i18n/translate'
@@ -776,7 +777,7 @@ async function runStep(step: AutomationStep, args: ExecuteArgs): Promise<string>
       const cfg = step.step_config as SendTemplateStepConfig
       if (!args.contactId) throw new Error(tErr('needsContact', { step: 'send_template' }))
       if (!cfg.template_name) throw new Error(tErr('needsTemplateName'))
-      const conversationId = await resolveConversationId(args)
+      const conversationId = await resolveConversationId(args, true)
       // Meta templates use positional {{1}}, {{2}}, … placeholders, so
       // we MUST emit params in strict numeric order. Lexicographic sort
       // of "1", "2", …, "10" yields "1", "10", "2", … which silently
@@ -1012,7 +1013,7 @@ async function runStep(step: AutomationStep, args: ExecuteArgs): Promise<string>
  * manual engine POSTs. Throws if none exists — send steps have
  * no meaningful target without a conversation.
  */
-async function resolveConversationId(args: ExecuteArgs): Promise<string> {
+async function resolveConversationId(args: ExecuteArgs, allowCreate = false): Promise<string> {
   const fromCtx = args.context.conversation_id
   if (fromCtx) {
     // Re-verify rather than trust the context. Dispatch already checks
@@ -1037,12 +1038,21 @@ async function resolveConversationId(args: ExecuteArgs): Promise<string> {
     .eq('contact_id', args.contactId)
     .maybeSingle()
   if (error) throw new Error(getT('LibErrors.send')('conversationLookupFailed', { message: error.message }))
-  if (!data?.id) {
-    throw new Error(
-      tErr(args.triggerEvent === 'tag_added' ? 'tagAddedNoConversation' : 'noConversation'),
-    )
+  if (data?.id) {
+    return data.id as string
   }
-  return data.id as string
+  if (allowCreate) {
+    const conversation = await findOrCreateConversationRow(
+      supabaseAdmin(),
+      args.automation.account_id,
+      args.contactId,
+      args.automation.user_id,
+    )
+    return conversation.id
+  }
+  throw new Error(
+    tErr(args.triggerEvent === 'tag_added' ? 'tagAddedNoConversation' : 'noConversation'),
+  )
 }
 
 /** Letter, digit or underscore in any script — the "inside a word" test. */

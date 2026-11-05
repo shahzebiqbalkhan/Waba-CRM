@@ -411,6 +411,34 @@ export function ImportModal({
         toast.warning(t('toastTagsWarning'));
       }
 
+      // 6) Dispatch tag_added automations for newly imported contacts
+      if (tagsAssigned > 0) {
+        try {
+          const items: Array<{ contactId: string; tagId: string }> = [];
+          for (const { contactId, tagNames } of tagAssignments) {
+            const seen = new Set<string>();
+            for (const name of tagNames) {
+              const tagId = tagIdByKey.get(name.trim().toLowerCase());
+              if (tagId && !seen.has(tagId)) {
+                seen.add(tagId);
+                items.push({ contactId, tagId });
+              }
+            }
+          }
+          if (items.length > 0) {
+            fetch('/api/contacts/tags/bulk-dispatch', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ items }),
+            }).catch((err) => {
+              console.error('[contacts import] bulk tag dispatch failed:', err);
+            });
+          }
+        } catch (dispatchErr) {
+          console.error('[contacts import] failed to initiate tag dispatch:', dispatchErr);
+        }
+      }
+
       setResult({
         imported,
         skipped,

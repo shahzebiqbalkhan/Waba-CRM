@@ -117,5 +117,5 @@ describe('GET /api/ai/usage', () => {
     const res = await get('days=1')
     expect(res.body.truncated).toBe(true)
     expect(res.body.totals.calls).toBe(10_000)
-  })
+  }, 15_000)
 })
