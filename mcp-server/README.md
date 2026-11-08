@@ -1,9 +1,9 @@
-# wacrm MCP server
+# WABA-CRM MCP Server
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server for
-**[wacrm](https://github.com/ArnasDon/wacrm)** — the self-hostable
-WhatsApp CRM. It lets MCP clients (Claude Desktop, Claude Code, Cursor,
-and others) drive your CRM in natural language:
+**[WABA-CRM](https://github.com/shahzebiqbalkhan/Waba-CRM)** — the self-hostable
+WhatsApp Business API CRM. It lets MCP clients (Claude Desktop, Claude Code, Cursor,
+ChatGPT, and others) drive your CRM in natural language:
 
 > "How many conversations are still open?"
 > "Find the contact for +1 415 555 0123 and show the last few messages."

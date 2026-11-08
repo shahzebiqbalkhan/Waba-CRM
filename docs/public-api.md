@@ -394,8 +394,7 @@ internal targets are refused at delivery time.
 
 ## Roadmap
 
-The public API now covers messaging, contacts, conversations,
-broadcasts, and outbound webhooks — the full scope of
-[#245](https://github.com/ArnasDon/wacrm/issues/245). Future ideas
+The public API covers messaging, contacts, conversations,
+broadcasts, and outbound webhooks. Future enhancements
 (deals/pipelines, templates, flows, a delivery queue for webhooks) are
-not yet scheduled.
+planned in upcoming releases.

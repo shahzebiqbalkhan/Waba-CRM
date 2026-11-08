@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.ArnasDon/wacrm-mcp",
-  "description": "Drive a self-hosted wacrm WhatsApp CRM from Claude, Cursor and other MCP clients.",
+  "name": "io.github.shahzebiqbalkhan/waba-crm-mcp",
+  "description": "Drive a self-hosted WABA-CRM WhatsApp CRM from Claude, Cursor and other MCP clients.",
   "repository": {
-    "url": "https://github.com/ArnasDon/wacrm",
+    "url": "https://github.com/shahzebiqbalkhan/Waba-CRM",
     "source": "github",
     "subfolder": "mcp-server"
   },

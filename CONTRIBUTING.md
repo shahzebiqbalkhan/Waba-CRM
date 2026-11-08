@@ -1,124 +1,75 @@
-# Using this template
+# Contributing to WABA-CRM
 
-This is a **template repository**, not a collaborative product. The
-expected flow is:
+Thank you for your interest in contributing to **WABA-CRM**! WABA-CRM is an open-source WhatsApp Business API CRM platform built on Next.js 16 and Supabase.
 
-1. **Fork** it to your own GitHub account or organisation.
-2. **Deploy** the fork — see [`docs/`](./docs/README.md).
-3. **Customise** your fork. Rebrand, add the features you need, remove
-   the ones you don't, swap hosting, change the schema.
+Whether you're fixing a bug, improving documentation, or proposing a new feature, contributions are welcome.
 
-You **don't** need to send changes back upstream. The fact that your
-fork diverges is the whole point — the upstream is deliberately
-opinionated about stack, UX, and scope, and your fork is where those
-opinions become yours.
+---
 
-## Fork and run
+## Code of Conduct
 
+Please be respectful and considerate in all communications and code reviews. Treat everyone in our community with respect and empathy.
+
+---
+
+## Development Setup
+
+### 1. Prerequisites
+- **Node.js**: `>= 22.12.0`
+- **npm**: `>= 10.9.0`
+- **Supabase Account / CLI** (for local database & authentication)
+- **Meta WhatsApp Business Cloud API App** (for live messaging testing)
+
+### 2. Fork and Clone
 ```bash
-# 1. Fork on GitHub: https://github.com/ArnasDon/wacrm → Fork
-# 2. Clone your fork
-git clone https://github.com/<your-username>/wacrm.git
-cd wacrm
+git clone https://github.com/shahzebiqbalkhan/Waba-CRM.git
+cd Waba-CRM
+```
 
-cp .env.local.example .env.local   # fill in Supabase + Meta creds
+### 3. Install Dependencies
+```bash
 npm install
+```
+
+### 4. Configure Environment
+Copy the example environment configuration:
+```bash
+cp .env.local.example .env.local
+```
+Fill in your Supabase credentials, app secret keys, and WhatsApp Cloud API tokens.
+
+### 5. Run Development Server
+```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) to access the application.
 
-Full setup (Supabase migrations, WhatsApp Business API, deploy) lives in
-[`docs/`](./docs/README.md).
+---
 
-## Keeping your fork up to date
+## Development Guidelines
 
-Pull in upstream bug fixes and security patches periodically:
+### Code Quality & Testing
+- **TypeScript**: Ensure strict type safety. Run `npm run typecheck` before opening a pull request.
+- **Linting & Formatting**: We use ESLint and Prettier. Run `npm run lint` and `npm run format:check`.
+- **Testing**: We use Vitest. Run unit and integration tests with `npm run test`.
+- **Database Migrations**: Add new SQL migration files to `supabase/migrations/` sequentially using standard naming conventions.
 
-```bash
-git remote add upstream https://github.com/ArnasDon/wacrm.git  # once
-git fetch upstream
-git checkout main
-git merge upstream/main     # or: git rebase upstream/main
-# Resolve any conflicts (likely in areas you've customised), then push
-git push origin main
-```
+### Pull Request Process
+1. Fork the repo and create your branch from `main`:
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+2. Make your commits clear and descriptive following conventional commits (`feat:`, `fix:`, `docs:`, `chore:`).
+3. Ensure all tests and type checks pass:
+   ```bash
+   npm run typecheck && npm run test
+   ```
+4. Push your branch and submit a Pull Request to `shahzebiqbalkhan/Waba-CRM:main`.
+5. Provide a clear PR description detailing your changes, motivation, and any testing performed.
 
-If you've made heavy local customisations, rebasing can surface
-conflicts every time you pull. Pinning to a specific upstream tag and
-updating on your schedule is a valid alternative.
+---
 
-## Reporting bugs in the upstream template
+## Reporting Bugs & Security
 
-If you find a bug in the upstream code — not one you introduced in your
-fork — please file it using the
-[bug report](https://github.com/ArnasDon/wacrm/issues/new?template=bug_report.yml)
-template. Including the commit SHA, the runtime (Hostinger / Vercel /
-local / other), and logs will get to a fix fastest.
-
-## Reporting security issues
-
-**Do not file security issues publicly.** Follow the private flow in
-[SECURITY.md](./.github/SECURITY.md).
-
-## Upstream pull requests
-
-Not the primary flow, but welcome in specific cases:
-
-- **Security fixes** — always welcome, please follow SECURITY.md first
-  for disclosure.
-- **Bug fixes** that match upstream intent (crash, correctness,
-  documentation errors, typos) — land quickly.
-- **Small improvements** (accessibility, obvious UX nits) — usually
-  welcome, open an issue first to check alignment.
-
-Less likely to land:
-
-- **New features.** The template's scope is intentionally narrow. A
-  "great idea for a CRM" is often a great idea for *your* CRM — i.e.
-  your fork — but would dilute the template for the next forker.
-- **Stack changes** (different ORM, different UI kit, different auth
-  provider). These belong in a fork, not upstream.
-- **Opinionated refactors** without a concrete correctness or
-  performance motivation.
-
-If you do send a PR, the usual rules apply:
-
-- Branch off the latest `main` (don't push to a merged branch — commits
-  end up orphaned).
-- Run `npm run typecheck` and `npm run format` locally first.
-- Fill in the PR template, especially the **Test plan**.
-- One logical change per PR.
-- Commit-message first line is imperative + terse; the body explains
-  the *why*, the diff shows the *what*.
-
-Expect a review within a few days. PRs opened without an issue may be
-closed — open the issue first to align.
-
-## If you maintain a public fork
-
-- Rebrand. The "CRM Template for WhatsApp" name, favicon, and
-  `wacrm.tech` URL belong to the upstream project; please swap them
-  for your own before putting your deployment in front of users.
-- Keep the MIT [`LICENSE`](./LICENSE) file — that's how the template's
-  permissions travel with the code. Attribution in a `README` section
-  is appreciated but not required.
-- You are free to re-license additions to your fork however you like.
-
-## Dev-loop reference
-
-Even if you never send a PR upstream, these are the scripts you'll use
-in your fork:
-
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Turbopack dev server on port 3000. |
-| `npm run build` | Production build. Next also runs its own typecheck here. |
-| `npm run typecheck` | `tsc --noEmit`. Fast TS-only pass. |
-| `npm run lint` | ESLint. |
-| `npm run format` | Prettier write. |
-| `npm run format:check` | Prettier in check-only mode. Useful in CI. |
-
-## Licensing
-
-This template is MIT ([`LICENSE`](./LICENSE)). Anything you contribute
-upstream is assumed to be MIT too. Your fork's additions are yours to
-license however you like.
+- **Bugs**: Open an issue using the [Bug Report template](https://github.com/shahzebiqbalkhan/Waba-CRM/issues/new?template=bug_report.yml).
+- **Security**: Please do **not** report security vulnerabilities via public issues. Refer to [SECURITY.md](./.github/SECURITY.md) for private disclosure instructions.

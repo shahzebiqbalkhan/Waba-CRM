@@ -1,8 +1,8 @@
-# MCP server
+# MCP Server
 
-wacrm ships a [Model Context Protocol](https://modelcontextprotocol.io)
+WABA-CRM ships a [Model Context Protocol](https://modelcontextprotocol.io)
 server so you can drive your CRM from AI assistants — Claude Desktop,
-Claude Code, Cursor, and any other MCP client — in natural language:
+Claude Code, Cursor, ChatGPT, and any other MCP client — in natural language:
 
 > "How many conversations are still open today?"
 > "Show the last five messages with +1 415 555 0123."

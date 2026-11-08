@@ -8,7 +8,7 @@ describe('initialsOf', () => {
   })
 
   it('uses two letters of a single name', () => {
-    expect(initialsOf('arnas')).toBe('AR')
+    expect(initialsOf('shahzeb')).toBe('SH')
   })
 
   it('falls back to # for phone numbers and empty names', () => {

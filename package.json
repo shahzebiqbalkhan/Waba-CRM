@@ -1,28 +1,30 @@
 {
-  "name": "wacrm",
-  "version": "0.8.0",
+  "name": "waba-crm",
+  "version": "1.0.0",
   "private": true,
-  "description": "Self-hostable CRM template for WhatsApp built on Next.js and Supabase — shared inbox, contacts, sales pipelines, broadcasts, and no-code automations.",
+  "description": "Production-ready, self-hostable WhatsApp Business API CRM built on Next.js 16 and Supabase — featuring multi-agent shared inbox, sequential contact IDs, automated tag workflows, visual automations, Meta-approved broadcasts, MCP server, and AI reply assistant.",
   "license": "MIT",
-  "author": "Arnas Donauskas",
-  "homepage": "https://github.com/ArnasDon/wacrm",
+  "author": "Shahzeb Iqbal Khan <shazepaperkhan@gmail.com>",
+  "homepage": "https://github.com/shahzebiqbalkhan/Waba-CRM",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ArnasDon/wacrm.git"
+    "url": "git+https://github.com/shahzebiqbalkhan/Waba-CRM.git"
   },
   "bugs": {
-    "url": "https://github.com/ArnasDon/wacrm/issues"
+    "url": "https://github.com/shahzebiqbalkhan/Waba-CRM/issues"
   },
   "keywords": [
     "crm",
     "whatsapp",
     "whatsapp-business-api",
+    "waba",
     "nextjs",
     "supabase",
     "automation",
     "broadcast",
     "self-hosted",
-    "template"
+    "mcp",
+    "openai"
   ],
   "engines": {
     "node": ">=22.12.0"
