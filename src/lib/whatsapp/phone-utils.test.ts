@@ -273,9 +273,15 @@ describe("cleanImportPhone", () => {
     expect(cleanImportPhone("+44 7911 123456")).toBe("+44 7911 123456");
   });
 
+  it("normalizes 10-digit Indian mobile numbers and Excel float formats", () => {
+    expect(cleanImportPhone("9876543210")).toBe("+919876543210");
+    expect(cleanImportPhone("919876543210.0")).toBe("+919876543210");
+    expect(cleanImportPhone("09876543210")).toBe("+919876543210");
+  });
+
   it("leaves other raw national numbers untouched so standard validator catches them", () => {
     expect(cleanImportPhone("4155551212")).toBe("4155551212");
-    expect(cleanImportPhone("9876543210")).toBe("9876543210");
+    expect(cleanImportPhone("12345")).toBe("12345");
   });
 
   it("returns empty string for blank or invalid input", () => {

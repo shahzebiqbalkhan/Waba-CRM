@@ -83,7 +83,7 @@ describe('parseBroadcastCsv', () => {
       `phone,name
 4155551212,National US
 +14155551212,Ada
-9876543210,National IN`
+12345,Invalid Short`
     );
 
     expect(result).toEqual({
