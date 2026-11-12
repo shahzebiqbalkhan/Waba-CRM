@@ -45,7 +45,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { planCustomValueWrites } from '@/lib/contacts/custom-value-writes';
 import { contactHandle } from '@/lib/whatsapp/wa-identity';
-import { parseInternationalPhone } from '@/lib/whatsapp/phone-utils';
+import { cleanImportPhone, parseInternationalPhone } from '@/lib/whatsapp/phone-utils';
 import { formatContactId } from '@/lib/contacts/format-contact-id';
 
 interface ContactDetailViewProps {
@@ -217,8 +217,9 @@ export function ContactDetailView({
     // and a country code (issue #586). Unchanged numbers — including the
     // digits-only form the inbound webhook stores — are left alone so a
     // name/email edit is never blocked by the phone field.
-    const phoneChanged = editPhone.trim() !== (contact?.phone ?? '');
-    if (phoneChanged && !parseInternationalPhone(editPhone)) {
+    const cleanedPhone = cleanImportPhone(editPhone) || editPhone.trim();
+    const phoneChanged = cleanedPhone !== (contact?.phone ?? '');
+    if (phoneChanged && !parseInternationalPhone(cleanedPhone)) {
       toast.error(t('toastPhoneNeedsCountryCode'));
       return;
     }
@@ -228,7 +229,7 @@ export function ContactDetailView({
       .from('contacts')
       .update({
         name: editName.trim() || null,
-        phone: editPhone.trim(),
+        phone: cleanedPhone,
         email: editEmail.trim() || null,
         company: editCompany.trim() || null,
         location: editLocation.trim() || null,

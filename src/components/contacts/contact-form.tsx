@@ -12,7 +12,7 @@ import {
   isUniqueViolation,
   type ExistingContact,
 } from '@/lib/contacts/dedupe';
-import { parseInternationalPhone } from '@/lib/whatsapp/phone-utils';
+import { cleanImportPhone, parseInternationalPhone } from '@/lib/whatsapp/phone-utils';
 import {
   Dialog,
   DialogContent,
@@ -141,8 +141,9 @@ export function ContactForm({
     // when the number actually changed — contacts created by the inbound
     // webhook store Meta's digits-only form, and editing their name must
     // not be blocked by a phone the user never touched.
-    const phoneChanged = !isEdit || phone.trim() !== (contact?.phone ?? '');
-    if (phoneChanged && !parseInternationalPhone(phone)) {
+    const cleanedPhone = cleanImportPhone(phone) || phone.trim();
+    const phoneChanged = !isEdit || cleanedPhone !== (contact?.phone ?? '');
+    if (phoneChanged && !parseInternationalPhone(cleanedPhone)) {
       toast.error(t('phoneNeedsCountryCode'));
       return;
     }
@@ -171,7 +172,7 @@ export function ContactForm({
           .from('contacts')
           .update({
             name: name.trim() || null,
-            phone: phone.trim(),
+            phone: cleanedPhone,
             email: email.trim() || null,
             company: company.trim() || null,
             location: location.trim() || null,
@@ -187,7 +188,7 @@ export function ContactForm({
             user_id: user.id,
             account_id: accountId,
             name: name.trim() || null,
-            phone: phone.trim(),
+            phone: cleanedPhone,
             email: email.trim() || null,
             company: company.trim() || null,
             location: location.trim() || null,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  cleanImportPhone,
   isRecipientNotAllowedError,
   isValidE164,
   normalizePhone,
@@ -250,5 +251,37 @@ describe("isRecipientNotAllowedError", () => {
       false,
     );
     expect(isRecipientNotAllowedError("")).toBe(false);
+  });
+});
+
+describe("cleanImportPhone", () => {
+  it("prepends + to 12-digit numbers starting with country code 91", () => {
+    expect(cleanImportPhone("919876543210")).toBe("+919876543210");
+    expect(cleanImportPhone("91 98765 43210")).toBe("+919876543210");
+    expect(cleanImportPhone("91-98765-43210")).toBe("+919876543210");
+  });
+
+  it("handles Meta Lead Ads p: prefix", () => {
+    expect(cleanImportPhone("p:919876543210")).toBe("+919876543210");
+    expect(cleanImportPhone("p:+919876543210")).toBe("+919876543210");
+    expect(cleanImportPhone("tel:+919876543210")).toBe("+919876543210");
+  });
+
+  it("preserves numbers already having + prefix", () => {
+    expect(cleanImportPhone("+919876543210")).toBe("+919876543210");
+    expect(cleanImportPhone("+14155551212")).toBe("+14155551212");
+    expect(cleanImportPhone("+44 7911 123456")).toBe("+44 7911 123456");
+  });
+
+  it("leaves other raw national numbers untouched so standard validator catches them", () => {
+    expect(cleanImportPhone("4155551212")).toBe("4155551212");
+    expect(cleanImportPhone("9876543210")).toBe("9876543210");
+  });
+
+  it("returns empty string for blank or invalid input", () => {
+    expect(cleanImportPhone("")).toBe("");
+    expect(cleanImportPhone("   ")).toBe("");
+    expect(cleanImportPhone(null)).toBe("");
+    expect(cleanImportPhone(undefined)).toBe("");
   });
 });

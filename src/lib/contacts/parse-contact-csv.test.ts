@@ -132,4 +132,17 @@ describe('parseContactCsv', () => {
       ],
     });
   });
+
+  it('normalizes Meta lead numbers starting with 91 without plus', () => {
+    const csv = `phone,name
+919876543210,Rahul
+p:919876543211,Amit
++919876543212,Priya`;
+
+    const { rows } = parseContactCsv(csv);
+    expect(rows).toHaveLength(3);
+    expect(rows[0].phone).toBe('+919876543210');
+    expect(rows[1].phone).toBe('+919876543211');
+    expect(rows[2].phone).toBe('+919876543212');
+  });
 });
